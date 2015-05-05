@@ -1,0 +1,14 @@
+---
+- name: create database user
+  delegate_to: "{{ redmine_db_delegate_to }}"
+  postgresql_user: >
+    name={{ redmine_db_user }}
+    password={{ redmine_db_pass }}
+  tags: accounts
+
+- name: create database
+  delegate_to: "{{ redmine_db_delegate_to }}"
+  postgresql_db: >
+    name={{ redmine_db_name }}
+    owner={{ redmine_db_user }}
+    encoding='UTF-8'

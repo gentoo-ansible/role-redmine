@@ -1,0 +1,62 @@
+---
+- name: install system dependencies
+  portage: package={{ item }}
+  with_items:
+    - '>=dev-lang/ruby-2.0.0'
+    - '>=dev-ruby/bundler-1.5.2'
+    - dev-db/postgresql
+    - dev-vcs/git
+    - dev-libs/libxml2
+    - dev-libs/libxslt
+    - media-gfx/imagemagick  # USE png
+    - dev-python/psycopg  # needed for postgresql modules
+  tags: packages
+
+- name: create system group
+  group: >
+    name={{ redmine_group }}
+    system=yes
+  tags: accounts
+
+- name: create system user
+  user: >
+    name={{ redmine_user }}
+    group={{ redmine_group }}
+    home={{ redmine_base_dir }}
+    createhome=no
+    system=yes
+  tags: accounts
+
+- name: prepare directories
+  file: >
+    state=directory
+    path={{ item.path }}
+    owner={{ item.owner | default(redmine_user) }}
+    group={{ item.group | default(redmine_group) }}
+    mode={{ item.mode | default('0755') }}
+  with_items:
+    - { path: "{{ redmine_base_dir }}" }
+    - { path: "{{ redmine_logs_dir }}" }
+    - { path: "{{ redmine_temp_dir }}", mode: '0700' }
+    - { path: "{{ redmine_attachments_dir }}", mode: '0700' }
+    - { path: "{{ redmine_conf_dir }}", owner: 'root', group: 'root' }
+
+- name: make symlinks to default locations
+  file: >
+    state=link
+    src={{ item.src }}
+    dest={{ item.dest }}
+    force=yes
+  with_items:
+    - { src: "{{ redmine_logs_dir }}", dest: "{{ redmine_base_dir }}/log" }
+    - { src: "{{ redmine_temp_dir }}", dest: "{{ redmine_base_dir }}/tmp" }
+
+- name: install runscript
+  copy: >
+    src=runscript
+    dest=/etc/init.d/redmine
+    owner=root group=root mode=0755
+
+- include: install_redmine.yml
+  sudo: yes
+  sudo_user: "{{ redmine_user }}"

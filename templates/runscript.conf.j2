@@ -1,0 +1,28 @@
+# {{ ansible_managed }}
+
+# User to run redmine. Default is redmine.
+redmine_user="{{ redmine_user }}"
+
+# Base directory of the Redmine app. Default is /opt/redmine.
+redmine_base="{{ redmine_base_dir }}"
+
+# Path of the directory to store logs. Default is /var/log/redmine.
+redmine_logs="{{ redmine_logs_dir }}"
+
+# Location of the pid file. Default is /run/redmine/puma.pid.
+pidfile="/run/redmine/puma.pid"
+
+# TCP address and port, or absolute path of the Unix socket to listen on.
+# E.g. 127.0.0.1:9292, /run/redmine/puma.sock
+# Default is /run/redmine/puma.pid.
+puma_listen="{{ redmine_puma_listen }}"
+
+# How many worker processes to run, or 0 to disable cluster mode (i.e. only
+# threads will be used for concurrency). Default is 0.
+puma_workers={{ redmine_puma_workers }}
+
+# Minimum number of threads to use. Default is 0.
+puma_threads_min={{ redmine_puma_threads[0] }}
+
+# Maximum number of threads to use. Default is 10.
+puma_threads_max={{ redmine_puma_threads[1] }}

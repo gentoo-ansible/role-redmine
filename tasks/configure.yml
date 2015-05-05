@@ -1,0 +1,50 @@
+---
+- name: configure redmine
+  template: >
+    src={{ item.path }}.j2
+    dest={{ redmine_conf_dir }}/{{ item.path }}
+    owner=root
+    group={{ redmine_group }}
+    mode={{ item.mode | default('0644') }}
+  with_items:
+    - { path: configuration.yml }
+    - { path: database.yml, mode: '0640' }
+  notify: reload redmine
+
+- name: generate secrets.yml with random keys
+  script: >
+    scripts/gen_secrets.rb '{{ redmine_conf_dir }}/secrets.yml'
+    creates={{ redmine_conf_dir }}/secrets.yml
+  notify: reload redmine
+
+- name: fix permissions on secrets.yml
+  file: >
+    path={{ redmine_conf_dir }}/secrets.yml
+    owner=root
+    group={{ redmine_group }}
+    mode=0640
+
+- name: symlink redmine configs to default location
+  file: >
+    state=link
+    src={{ redmine_conf_dir }}/{{ item }}
+    dest={{ redmine_base_dir }}/config/{{ item }}
+    force=yes
+  with_items:
+    - configuration.yml
+    - database.yml
+    - secrets.yml
+
+- name: configure redmine runscript
+  template: >
+    src=runscript.conf.j2
+    dest=/etc/conf.d/redmine
+    owner=root group=root mode=0644
+  notify: restart redmine
+
+- name: configure logrotate
+  template: >
+    src=logrotate.j2
+    dest=/etc/logrotate.d/redmine
+    owner=root group=root mode=0644
+  ignore_errors: yes

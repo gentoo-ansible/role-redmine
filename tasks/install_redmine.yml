@@ -1,0 +1,42 @@
+---
+  # The aim is to exclude unwanted directories and avoid its recreating
+  # on every checkout.
+- name: prepare sparse git repository for redmine
+  shell: |
+    git init
+    git config core.sparsecheckout true
+    git remote add origin {{ redmine_source_url }}
+    chdir={{ redmine_base_dir }}
+    creates={{ redmine_base_dir }}/.git
+  register: _redmine_init
+
+- name: configure sparse-checkout for redmine
+  copy: >
+    dest={{ redmine_base_dir }}/.git/info/sparse-checkout
+    content='{{ redmine_sparsecheckout | join("\n") }}'
+
+- name: clone redmine source repository
+  git: >
+    repo={{ redmine_source_url }}
+    version={{ redmine_source_rev }}
+    dest={{ redmine_base_dir }}
+    accept_hostkey=yes
+  register: _redmine_clone
+
+- name: create Gemfile.local with gem 'puma'
+  copy: >
+    dest={{ redmine_base_dir }}/Gemfile.local
+    content="gem 'puma'\n"
+
+- name: copy puma.rb and additional_environment.rb
+  copy: >
+    src={{ item }}
+    dest={{ redmine_base_dir }}/config/{{ item }}
+  with_items:
+    - puma.rb
+    - additional_environment.rb
+
+- name: copy database_cipher_key.rb
+  copy: >
+    src=database_cipher_key.rb
+    dest={{ redmine_base_dir }}/config/initializers/

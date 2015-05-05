@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+production:
+  adapter: postgresql
+  encoding: utf8
+  database: {{ redmine_db_name }}
+  pool: {{ redmine_db_pool }}
+  username: {{ redmine_db_user }}
+  password: "{{ redmine_db_pass }}"
+  host: {{ redmine_db_host }}
+  port: {{ redmine_db_port }}

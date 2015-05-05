@@ -1,0 +1,33 @@
+---
+- include: install.yml
+  tags: install
+
+- include: configure.yml
+  tags: config
+
+- include: database.yml
+  sudo: yes
+  sudo_user: postgres
+  tags: database
+
+- include: initialize.yml
+  sudo: yes
+  sudo_user: "{{ redmine_user }}"
+  when: _redmine_init | changed
+  tags: install
+
+- include: upgrade.yml
+  sudo: yes
+  sudo_user: "{{ redmine_user }}"
+  when: _redmine_init | skipped and _redmine_clone.before != _redmine_clone.after
+  tags: install
+
+  # Trigger handlers now to avoid unnecessary restarts.
+- meta: flush_handlers
+
+- name: enable and start redmine
+  service: >
+    name=redmine
+    enabled=yes
+    state=started
+  tags: services

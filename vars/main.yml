@@ -1,0 +1,12 @@
+---
+# Paths to exclude from the redmine source repo.
+redmine_sparsecheckout:
+  - '/*'
+  - '!/files'
+  - '!/log'
+  - '!/script'
+  - '!/tmp'
+  - '!.hgignore'
+
+redmine_bundle_install_opts: "-j{{ ansible_processor_count }} --path vendor/bundle \
+    --without development test"

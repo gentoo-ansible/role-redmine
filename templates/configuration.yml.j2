@@ -1,0 +1,135 @@
+# {{ ansible_managed }}
+# = Redmine configuration file
+#
+# Each environment has it's own configuration options.  If you are only
+# running in production, only the production block needs to be configured.
+# Environment specific configuration options override the default ones.
+#
+# Note that this file needs to be a valid YAML file.
+# DO NOT USE TABS! Use 2 spaces instead of tabs for identation.
+
+# default configuration options for all environments
+default:
+  # Outgoing emails configuration
+  # See the examples below and the Rails guide for more configuration options:
+  # http://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
+  email_delivery:
+
+  email_delivery:
+    delivery_method: :{{ redmine_mail_delivery_method }}
+    smtp_settings:
+      address: "{{ redmine_smtp_host }}"
+      port: {{ redmine_smtp_port }}
+
+  # Absolute path to the directory where attachments are stored.
+  # The default is the 'files' directory in your Redmine instance.
+  # Your Redmine instance needs to have write permission on this
+  # directory.
+  # Examples:
+  # attachments_storage_path: /var/redmine/files
+  attachments_storage_path: "{{ redmine_attachments_dir }}"
+
+  # Configuration of the autologin cookie.
+  # autologin_cookie_name: the name of the cookie (default: autologin)
+  # autologin_cookie_path: the cookie path (default: /)
+  # autologin_cookie_secure: true sets the cookie secure flag (default: false)
+  autologin_cookie_name:
+  autologin_cookie_path:
+  autologin_cookie_secure:
+
+  # Configuration of SCM executable command.
+  #
+  # Absolute path (e.g. /usr/local/bin/hg) or command name (e.g. hg, bzr).
+  #
+  # Examples:
+  # scm_subversion_command: svn                                       # (default: svn)
+  # scm_mercurial_command:  /usr/local/bin/hg                         # (default: hg)
+  # scm_git_command:        /usr/local/bin/git                        # (default: git)
+  # scm_cvs_command:        cvs                                       # (default: cvs)
+  # scm_bazaar_command:     bzr                                       # (default: bzr)
+  # scm_darcs_command:      darcs-1.0.9-i386-linux                    # (default: darcs)
+  #
+  scm_subversion_command:
+  scm_mercurial_command:
+  scm_git_command:
+  scm_cvs_command:
+  scm_bazaar_command:
+  scm_darcs_command:
+
+  # SCM paths validation.
+  #
+  # You can configure a regular expression for each SCM that will be used to
+  # validate the path of new repositories (eg. path entered by users with the
+  # "Manage repositories" permission and path returned by reposman.rb).
+  # The regexp will be wrapped with \A \z, so it must match the whole path.
+  # And the regexp is case sensitive.
+  #
+  # You can match the project identifier by using %project% in the regexp.
+  #
+  # You can also set a custom hint message for each SCM that will be displayed
+  # on the repository form instead of the default one.
+  #
+  # Examples:
+  # scm_subversion_path_regexp: file:///svnpath/[a-z0-9_]+
+  # scm_subversion_path_info: SVN URL (eg. file:///svnpath/foo)
+  #
+  # scm_git_path_regexp: /gitpath/%project%(\.[a-z0-9_])?/
+  #
+  scm_subversion_path_regexp:
+  scm_mercurial_path_regexp:
+  scm_git_path_regexp:
+  scm_cvs_path_regexp:
+  scm_bazaar_path_regexp:
+  scm_darcs_path_regexp:
+  scm_filesystem_path_regexp:
+
+  # Absolute path to the SCM commands errors (stderr) log file.
+  # The default is to log in the 'log' directory of your Redmine instance.
+  # Example:
+  # scm_stderr_log_file: /var/log/redmine_scm_stderr.log
+  scm_stderr_log_file: "{{ redmine_logs_dir }}/scm.stderr.log"
+
+  # Set this to false to disable plugins' assets mirroring on startup.
+  # You can use `rake redmine:plugins:assets` to manually mirror assets
+  # to public/plugin_assets when you install/upgrade a Redmine plugin.
+  #
+  #mirror_plugins_assets_on_startup: false
+
+  # Absolute path (e.g. /usr/bin/convert) to the ImageMagick's `convert` binary.
+  # Used to generate attachment thumbnails.
+  imagemagick_convert_command: /usr/bin/convert
+
+  # Configuration of RMagcik font.
+  #
+  # Redmine uses RMagcik in order to export gantt png.
+  # You don't need this setting if you don't install RMagick.
+  #
+  # In CJK (Chinese, Japanese and Korean),
+  # in order to show CJK characters correctly,
+  # you need to set this configuration.
+  #
+  # Because there is no standard font across platforms in CJK,
+  # you need to set a font installed in your server.
+  #
+  # This setting is not necessary in non CJK.
+  #
+  # Examples for Japanese:
+  #   rmagick_font_path: /usr/share/fonts/ipa-mincho/ipam.ttf
+  #
+  rmagick_font_path: "{{ redmine_rmagick_font_path }}"
+
+  # Maximum number of simultaneous AJAX uploads
+  #max_concurrent_ajax_uploads: 2
+
+  # Configure OpenIdAuthentication.store
+  #
+  # allowed values: :memory, :file, :memcache
+  #openid_authentication_store: :memory
+
+# specific configuration options for production environment
+# that overrides the default ones
+production:
+
+# specific configuration options for development environment
+# that overrides the default ones
+development:

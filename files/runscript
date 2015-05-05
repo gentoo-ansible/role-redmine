@@ -1,0 +1,55 @@
+#!/sbin/runscript
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+name="redmine"
+description="Redmine project management web application."
+
+extra_started_commands="reload"
+description_reload="Perform a hot restart (keeps the server sockets open)."
+
+: ${redmine_user:=redmine}
+: ${redmine_base:=/opt/redmine}
+: ${redmine_logs:=/var/log/redmine}
+: ${pidfile:=/run/redmine/puma.pid}
+
+: ${rails_env:=production}
+: ${puma_listen:=/run/redmine/puma.sock}
+: ${puma_workers:=0}
+: ${puma_threads_min:=0}
+: ${puma_threads_max:=10}
+
+required_dirs="${redmine_base}"
+required_files="${redmine_base}/config/puma.rb"
+
+command="/usr/bin/bundle"
+command_args="exec puma -C ${redmine_base}/config/puma.rb"
+command_background="yes"
+
+start_stop_daemon_args="
+	--chdir '$redmine_base'
+	--user $redmine_user
+	--stdout '${redmine_logs}/puma.stdout.log'
+	--stderr '${redmine_logs}/puma.stderr.log'
+	--env RAILS_ENV=$rails_env
+	--env PUMA_LISTEN='$puma_listen'
+	--env PUMA_WORKERS=$puma_workers
+	--env PUMA_THREADS_MIN=$puma_threads_min
+	--env PUMA_THREADS_MAX=$puma_threads_max
+"
+
+depend() {
+	provide redmine
+	use net postgresql
+}
+
+start_pre() {
+	checkpath -d -o $redmine_user -m755 "$(dirname "$pidfile")"
+	checkpath -d -o $redmine_user -m755 "$redmine_logs"
+}
+
+reload() {
+	ebegin "Reloading $name"
+	kill -USR2 $(head -n1 $pidfile)
+	eend $?
+}

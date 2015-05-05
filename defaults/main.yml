@@ -1,0 +1,83 @@
+---
+# URL of the redmine repository to clone.
+redmine_source_url: https://github.com/redmine/redmine.git
+
+# Revision (tag or branch) to checkout.
+redmine_source_rev: 3.0.2
+
+
+# User to run the Redmine (will be created if not exist).
+redmine_user: redmine
+
+# Group to run the Redmine (will be created if not exist).
+redmine_group: "{{ redmine_user }}"
+
+# Language of the initial data set to be loaded.
+redmine_lang: en
+
+# Path of the font file to use for exporting gantt diagram to PNG.
+redmine_rmagick_font_path: /usr/share/fonts/dejavu/DejaVuSans.ttf
+
+#
+# Outgoing emails
+#
+
+# Method used to send emails. Possible values are:
+#   sendmail      - send emails using sendmail command (default).
+#   smtp          - send emails using SMTP server.
+#   letter_opener - open sent emails in browser.
+#   test          - save emails to ActionMailer::Base.deliveries array.
+redmine_mail_delivery_method: sendmail
+
+# Hostname of the SMTP server used to send emails.
+redmine_smtp_host: "{{ smtp_host | default(inventory_hostname) }}"
+
+# Port of the SMTP server used to send emails.
+redmine_smtp_port: "{{ smtp_port | default(25) }}"
+
+#
+# Database
+#
+
+redmine_db_name: redmine
+redmine_db_user: "{{ redmine_db_name }}"
+redmine_db_pass: redmine
+redmine_db_host: "{{ pg_host | default('localhost') }}"
+redmine_db_port: 5432
+redmine_db_pool: 6
+
+# Should not be changed!
+redmine_db_delegate_to: "{{ redmine_db_host | replace('localhost', inventory_hostname) | replace('127.0.0.1', inventory_hostname) }}"
+
+#
+# Puma (rack server)
+#
+
+# Number of worker processes to use, or 0 to disable cluster mode (i.e. only
+# threads will be used for concurrency).
+redmine_puma_workers: 0
+
+# Number of threads to use. It should be an array with [min, max].
+redmine_puma_threads: [0, 10]
+
+# TCP address (and port), or absolute path of the Unix socket to listen on.
+redmine_puma_listen: /run/redmine/puma.sock
+
+#
+# Paths
+#
+
+# Path of the directory to install redmine into.
+redmine_base_dir: /opt/redmine
+
+# Path of the configuration directory.
+redmine_conf_dir: /etc/redmine
+
+# Path of the logs directory.
+redmine_logs_dir: /var/log/redmine
+
+# Path of the temp directory.
+redmine_temp_dir: /var/tmp/redmine
+
+# Path of the directory to store attachments.
+redmine_attachments_dir: "{{ redmine_base_dir }}/files"

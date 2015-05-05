@@ -1,0 +1,29 @@
+---
+- name: stop redmine
+  sudo_user: root
+  service: >
+    name=redmine
+    state=stopped
+
+- name: run bundle update (this will take few minutes)
+  command: >
+    bundle update {{ redmine_bundle_install_opts }}
+    chdir={{ redmine_base_dir }}
+
+- name: migrate database
+  command: >
+    bundle exec rake db:migrate RAILS_ENV=production
+    chdir={{ redmine_base_dir }}
+  notify: restart redmine
+
+- name: migrate plugins
+  command: >
+    bundle exec rake redmine:plugins:migrate RAILS_ENV=production
+    chdir={{ redmine_base_dir }}
+  notify: restart redmine
+
+- name: clear cache and existing sessions
+  command: >
+    bundle exec rake tmp:cache:clear tmp:sessions:clear RAILS_ENV=production
+    chdir={{ redmine_base_dir }}
+  notify: restart redmine

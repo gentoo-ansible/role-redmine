@@ -1,0 +1,10 @@
+---
+- name: restart redmine
+  service: >
+    name=redmine
+    state=restarted
+
+- name: reload redmine
+  service: >
+    name=redmine
+    state=reloaded
